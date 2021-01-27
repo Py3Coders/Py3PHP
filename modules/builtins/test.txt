@@ -1,0 +1,4 @@
+# Format:
+# PyFunc:PHPFunc:(ArgsAlsType)
+# Args sind dann getrennt durch einem Komma
+len:strlen:(string)
