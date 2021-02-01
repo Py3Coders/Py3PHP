@@ -2,9 +2,9 @@ import os
 
 
 class Parser:
-    def __init__(self, code, modules, path="modules/"):
+    def __init__(self, code=None, loaded=None, path="modules/"):
         self.code = code
-        self.modules = modules
+        self.loaded = loaded
         self.path = path
 
     def loadModules(self):
@@ -13,7 +13,7 @@ class Parser:
         """
         loaded_modules = {
             "vars": [],
-            "functions": [],
+            "external": [],
             "builtins": []
         }
         for dir in os.listdir(self.path):
@@ -32,6 +32,47 @@ class Parser:
                         loaded_modules["vars"].append(line)
         return loaded_modules
 
+    def splitter(self):
+        splitted_modules = {
+            "builtins": [],
+            "external": [],
+            "vars": []
+        }
+        for mod in self.loaded:
+            if len(mod) > 0:
+                temp_array = {
+                    "python_function": "",
+                    "php_function": "",
+                    "args": {}
+                }
+                if mod == "builtins":
+                    for m in self.loaded[mod]:
+                        split = m.split(":")
+                        args_split = split[2].replace("(", "").replace(")", "").split(",")
+                        temp_array["python_function"] = split[0]
+                        temp_array["php_function"] = split[1]
+                        for arg in args_split:
+                            temp_array["args"].setdefault(arg.split("|")[0], arg.split("|")[1])
+                        splitted_modules["builtins"].append(temp_array)
+                elif mod == "external":
+                    for m in self.loaded[mod]:
+                        split = m.split(":")
+                        args_split = split[2].replace("(", "").replace(")", "").split(",")
+                        temp_array["python_function"] = split[0]
+                        temp_array["php_function"] = split[1]
+                        for arg in args_split:
+                            temp_array["args"].setdefault(arg.split("|")[0], arg.split("|")[1])
+                        splitted_modules["external"].append(temp_array)
+                elif mod == "vars":
+                    for m in self.loaded[mod]:
+                        split = m.split(":")
+                        args_split = split[2].replace("(", "").replace(")", "").split(",")
+                        temp_array["python_function"] = split[0]
+                        temp_array["php_function"] = split[1]
+                        for arg in args_split:
+                            temp_array["args"].setdefault(arg.split("|")[0], arg.split("|")[1])
+                        splitted_modules["vars"].append(temp_array)
+        return splitted_modules
     def replacer(self, content):
 
         """Replacer for Py3PHP
